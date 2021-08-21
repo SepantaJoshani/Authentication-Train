@@ -20,7 +20,7 @@ const AuthForm = () => {
     if (isLogin) {
     } else {
       fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyA547WTLdGxU6GquslqyvZnyECfXrrgVCE",
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyApbaGiLEOzPWr-DntPaNgKTH_q5lqy2PA",
         {
           method: "POST",
           body: JSON.stringify({
@@ -37,8 +37,11 @@ const AuthForm = () => {
           //...
         } else {
           return res.json().then((data) => {
-            //show error and ...I didnt do any validation
-            console.log(data);
+            let errorMessage = "Authentication failed";
+            if (data && data.error && data.error.message) {
+              errorMessage = data.error.message;
+            }
+            alert(errorMessage);
           });
         }
       });
