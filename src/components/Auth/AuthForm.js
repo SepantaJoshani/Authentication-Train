@@ -6,7 +6,7 @@ const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
   const emailInpRef = useRef();
   const passwordInpRef = useRef();
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -18,8 +18,43 @@ const AuthForm = () => {
     const enteredEmail = emailInpRef.current.value;
     const enteredPassword = passwordInpRef.current.value;
 
-    setIsLoading(true)
+    setIsLoading(true);
     if (isLogin) {
+      fetch(
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyApbaGiLEOzPWr-DntPaNgKTH_q5lqy2PA",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: enteredEmail,
+            password: enteredPassword,
+            returnSecureToken: true,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+        .then((res) => {
+          setIsLoading(false);
+          if (res.ok) {
+            return res.json();
+          } else {
+            return res.json().then((data) => {
+              let errorMessage = "Authentication failed";
+              if (data && data.error && data.error.message) {
+                errorMessage = data.error.message;
+              }
+              alert(errorMessage);
+              throw new Error(errorMessage);
+            });
+          }
+        })
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((err) => {
+          alert(err.message);
+        });
     } else {
       fetch(
         "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyApbaGiLEOzPWr-DntPaNgKTH_q5lqy2PA",
@@ -35,7 +70,7 @@ const AuthForm = () => {
           },
         }
       ).then((res) => {
-        setIsLoading(false)
+        setIsLoading(false);
         if (res.ok) {
           //...
         } else {
@@ -64,9 +99,11 @@ const AuthForm = () => {
           <input type="password" id="password" ref={passwordInpRef} required />
         </div>
         <div className={classes.actions}>
-          {!isLoading&&<button>{isLogin ? "Login" : "Create Account"}</button>}
-         {isLoading && <p style={{color:"#ffffffff"}}>Sending Data ...</p>}
-         
+          {!isLoading && (
+            <button>{isLogin ? "Login" : "Create Account"}</button>
+          )}
+          {isLoading && <p style={{ color: "#ffffffff" }}>Sending Data ...</p>}
+
           <button
             type="button"
             className={classes.toggle}
